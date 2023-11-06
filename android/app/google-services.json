@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "289379816881",
+    "project_id": "game-over-mobile-app",
+    "storage_bucket": "game-over-mobile-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289379816881:android:d9726ef8bba6bea9309990",
+        "android_client_info": {
+          "package_name": "com.gameover.app.gameover_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Jrc9fnBRgN9A-H7_9ppmSSh2x36KbYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
