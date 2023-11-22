@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gameover_app/admin/QRGenerator.dart';
+import 'package:gameover_app/admin/trophees/TrophyManagerPage.dart';
 
 import 'ActivityManagerPage.dart';
 
@@ -40,6 +41,21 @@ class AdminHub extends StatelessWidget {
               child: Text('Générer un QR code'),
             ),
             Spacer(), // Espace du bas
+
+            ElevatedButton(
+              onPressed: () {
+                // Action pour "Générer un QR code"
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TrophyManagerPage()),
+                );
+
+
+              },
+              child: Text('Administrer les trophées'),
+            ),
+            Spacer(),
           ],
         ),
       ),

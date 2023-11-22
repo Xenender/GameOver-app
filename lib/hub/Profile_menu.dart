@@ -1,10 +1,17 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:cached_firestorage/cached_firestorage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover_app/animations/LoadingPage.dart';
 import 'package:gameover_app/repository/User_repository.dart';
+import 'package:gameover_app/repository/trophy/Trophy_model.dart';
+import 'package:gameover_app/repository/trophy/Trophy_repository.dart';
+import 'package:gameover_app/repository/trophy_user/Trophy_user_model.dart';
+import 'package:gameover_app/repository/trophy_user/Trophy_user_repository.dart';
+import 'package:gameover_app/repository/user_history/User_history_model.dart';
+import 'package:gameover_app/repository/user_history/User_history_repository.dart';
 import 'package:gameover_app/updatedLIBS/remote_picture_up.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,15 +35,21 @@ class _ProfileMenuState extends State<ProfileMenu> {
   ImagePicker picker = ImagePicker();
   File? image;
 
-  List<String> trophies = [
-    'Trophée 1',
-    'Trophée 2',
-    'Trophée 3',
-    'Trophée 4',
-    'Trophée 5',
-    'Trophée 6',
+  List<Trophy_model> trophies = [
     // Ajoutez vos trophées ici
   ];
+
+  List<Trophy_user_model> trophiesUsers = [
+    // Ajoutez vos trophées ici
+  ];
+
+  // Tableau associatif à créer
+  Map<String, List<String>> tableauAssociatifTrophy = {};
+
+  //tabHistory
+  List<Text> tabHistorique = [];
+
+  List<GestureDetector> imageTropheesList = [];
 
 
 
@@ -73,6 +86,174 @@ class _ProfileMenuState extends State<ProfileMenu> {
         avatarViewRadius: 100,);
     });
 
+    //get all trophy
+    List<Trophy_model> listeTrophy;
+    Trophy_repository trophy_rep = Trophy_repository();
+    listeTrophy = await trophy_rep.allTrophy();
+
+
+
+    //get all trophy_user
+
+    List<Trophy_user_model> listeTrophyUser;
+    Trophy_user_repository trophyUser_rep = Trophy_user_repository();
+    listeTrophyUser = await trophyUser_rep.allTrophy_user();
+
+    //creer tab asso
+
+    Map<String, List<String>> tableauAssociatifTrophy2 = {};
+
+    for (Trophy_model Trophy in listeTrophy) {
+      // Vous pouvez remplacer cette liste factice par vos propres données
+      List<String> idUtilisateurs = [];
+      for(Trophy_user_model trophyUser in listeTrophyUser){
+        if(trophyUser.trophy == Trophy.code){
+          idUtilisateurs.add(trophyUser.user!);
+        }
+      }
+
+      // Ajouter la clé et la liste d'ID d'utilisateurs dans le tableau associatif
+      tableauAssociatifTrophy2[Trophy.code!] = idUtilisateurs;
+    }
+
+    print("tab asso");
+    print(tableauAssociatifTrophy2);
+
+    setState(() {
+      trophies = listeTrophy;
+      trophiesUsers = listeTrophyUser;
+      tableauAssociatifTrophy = tableauAssociatifTrophy2;
+
+
+    });
+
+    //remplir tableau historique
+
+    User_history_repository historyRep = User_history_repository();
+    List<User_history_model> listHistoryModel = await historyRep.allHistory();
+
+    List<Text> tabHistorique2 = [];
+    for(User_history_model model in listHistoryModel)
+      {
+        if(model.user == _userId){
+          //appartient à son historique
+          String text = "+ ${model.titre}: ${model.xp}Xp";
+          tabHistorique2.add(Text(text));
+        }
+      }
+    setState(() {
+      tabHistorique = tabHistorique2;
+
+    });
+
+
+
+    //charger les trophées dans la liste de container en gris ou couleur
+
+
+
+    List<GestureDetector> listeTrophee2 = [];
+
+    for(int index=0;index<trophies.length;index++){
+      String trophyCode = trophies[index].code ?? "";
+      GestureDetector img = GestureDetector();
+
+      if (tableauAssociatifTrophy[trophyCode]!.contains(_userId)) {
+        // L'utilisateur possède le trophy
+        print("Possède le trophy");
+
+        img = GestureDetector(onTap: () {
+          _showTrophyDetailsDialog(
+              context, trophies[index].titre!, trophies[index].description!);
+        },
+            child:
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.black12,
+                    width: 2.0,
+                  ),
+                ),
+                child: ClipOval(
+                  child: image == null
+                      ? RemotePictureUp(
+                    imagePath: trophies[index].img!,
+                    mapKey: trophies[index].img!,
+                    fit: BoxFit.cover,
+                    useAvatarView: true,
+                    avatarViewRadius: 60, // Ajustez la taille du cercle ici
+                  )
+                      : Image.file(
+                    image!,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            )
+
+        );
+      }
+            else {
+        // Ne possède pas le trophy
+        print("Non possédé !");
+
+        img = GestureDetector(onTap: (){
+          _showTrophyDetailsDialog(context, trophies[index].titre!, trophies[index].description!);
+        },
+        child:
+        Padding(
+        padding: EdgeInsets.all(8),
+        child: Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.black12,
+              width: 2.0,
+            ),
+          ),
+          child: ClipOval(
+            child: image == null
+                ? ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Colors.grey,
+                BlendMode.saturation,
+              ),
+              child: RemotePictureUp(
+                imagePath: trophies[index].img!,
+                mapKey: trophies[index].img!,
+                fit: BoxFit.cover,
+                useAvatarView: true,
+                avatarViewRadius: 60, // Ajustez la taille du cercle ici
+              ),
+            )
+                : Image.file(
+              image!,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        )
+
+    ,);
+      }
+
+      listeTrophee2.add(img);
+    }
+
+    setState(() {
+      imageTropheesList = listeTrophee2;
+    });
+
+
+
+    //fin charger les trophées dans la liste de container
 
 
   }
@@ -112,7 +293,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
                               width: 2.0,
                             ),
                           ),
-                          child: image ==  null 
+                          child: image ==  null
                                  ?
                                     imageRemote
                                  :
@@ -243,32 +424,41 @@ class _ProfileMenuState extends State<ProfileMenu> {
                 )
                 ,
                 Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(8.0),
                   child: Container(
-                    height: 100, // Ajustez la hauteur en fonction de votre mise en page
-                    child: ListView.builder(
+
+                    height: 80, // Ajustez la hauteur en fonction de votre mise en page
+                    child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      itemCount: trophies.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: 80, // Ajustez la largeur en fonction de votre mise en page
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.blue, // Couleur de fond du trophée
-                            ),
-                            child: Center(
-                              child: Text(
-                                trophies[index],
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                      child: Row(
+
+                        children: imageTropheesList,
+                      ),
+                    )
                   ),
+                ),
+
+                Padding(padding: EdgeInsets.only(top: 25,bottom: 16,left: 16,right: 16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.history, // Utilisez l'icône de votre choix
+                        color: Colors.yellow, // Couleur de l'icône
+                        size: 30, // Taille de l'icône
+                      ),
+                      SizedBox(width: 10), // Espace entre l'icône et le texte
+                      Text(
+                        "Historique",
+                        style: TextStyle(fontSize: 35),
+                      ),
+                    ],
+                  ),
+                ),
+
+
+
+                Column(
+                  children: tabHistorique,
                 )
 
 
@@ -287,6 +477,27 @@ class _ProfileMenuState extends State<ProfileMenu> {
     super.dispose();
   }
 
+  // Méthode pour afficher la fenêtre de détails du trophée
+  void _showTrophyDetailsDialog(BuildContext context, String titre, String description) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(titre),
+          content: Text(description),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Fermer'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),  
+          ],
+        );
+      },
+    );
+  }
+
   Future chooseImage(ImageSource source) async{
     XFile? file = await picker.pickImage(source: source,imageQuality: 10);
     if(file != null){
@@ -297,6 +508,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
     }
 
   }
+
 
   void updateChanges() async{
 

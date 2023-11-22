@@ -3,15 +3,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Qr_model{
   String? id;
 
-  int? xp;
+  String? xp;
 
-  Qr_model({this.id,required this.xp}){
+  String titre;
+
+  Qr_model({this.id,required this.xp,required this.titre}){
 
   }
 
   toJson(){
     return {
       "xp":xp,
+      "titre":titre
     };
   }
 
@@ -20,6 +23,7 @@ class Qr_model{
     return Qr_model(
         id: document.id,
         xp: data?["xp"],
+        titre: data?["titre"]
 
     );
   }

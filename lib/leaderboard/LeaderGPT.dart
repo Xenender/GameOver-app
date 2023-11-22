@@ -29,7 +29,7 @@ class LeaderGPT extends StatelessWidget {
 
           body:
           Container(
-            padding: EdgeInsetsDirectional.only(top: 60,start: 20,end: 20,bottom: 0),
+            padding: EdgeInsetsDirectional.only(top: 60,start: 0,end: 0,bottom: 0),
             child:
             FutureBuilder<List<User>>(
               future: parseBdd(),

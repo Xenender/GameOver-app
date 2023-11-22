@@ -1,40 +1,51 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gameover_app/repository/Activity_model.dart';
+
 import 'package:gameover_app/repository/Storage_service.dart';
-import 'package:gameover_app/repository/User_model.dart';
+import 'package:gameover_app/repository/trophy/Trophy_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Activity_repository {
+class Trophy_repository {
 
   final _db = FirebaseFirestore.instance;
 
-  Future<String> createActivity(Activity_model activity) async {
+  Future<String> createTrophy(Trophy_model trophy) async {
 
     String leReturn = "";
 
-    DocumentReference activityRef = await _db.collection("activity").add(activity.toJson()).whenComplete(() async {
+    DocumentReference trophyRef = await _db.collection("trophy").add(trophy.toJson()).whenComplete(() async {
 
       print("info envoyées");
 
     }).catchError(()=>print("erreur d'envoie"));
 
-    if(activityRef != null){
+    if(trophyRef != null){
 
-      String activityId = activityRef.id;
+      String trophyId = trophyRef.id;
 
       //ajouter le chemin vers pdp à l'objet USER avec le bon nomage
 
-      if(activity.img != null){
-        await _db.collection("activity")
-            .doc(activityId) // <-- Doc ID where data should be updated.
-            .update({"img":"${activity.img}"})
+      if(trophy.img != null){
+        await _db.collection("trophy")
+            .doc(trophyId) // <-- Doc ID where data should be updated.
+            .update({"img":"${trophy.img}"})
             .then((value) => null);
       }
       else{
-        await _db.collection("activity")
-            .doc(activityId) // <-- Doc ID where data should be updated.
-            .update({"img":"images/$activityId"})
+
+        //update image
+        await _db.collection("trophy")
+            .doc(trophyId) // <-- Doc ID where data should be updated.
+            .update({"img":"images/$trophyId"})
+            .then((value) => null);
+
+
+      }
+      if(trophy.code == null){
+        //update code
+        await _db.collection("trophy")
+            .doc(trophyId) // <-- Doc ID where data should be updated.
+            .update({"code":"code_$trophyId"})
             .then((value) => null);
       }
 
@@ -43,7 +54,7 @@ class Activity_repository {
 
       //Ajouter la pdp avec le non nomage au STOCKAGE là onj on a effectué le create user grace au RETURN
 
-      leReturn = activityId;
+      leReturn = trophyId;
 
 
     }
@@ -51,29 +62,28 @@ class Activity_repository {
     return leReturn;
   }
 
-  Future<List<Activity_model>> allActivity() async{
-    final snapshot = await _db.collection("activity").get();
-    final activityData = snapshot.docs.map((e) => Activity_model.fromDocumentSnap(e)).toList();
-    return activityData;
+  Future<List<Trophy_model>> allTrophy() async{
+    final snapshot = await _db.collection("trophy").get();
+    final trophyData = snapshot.docs.map((e) => Trophy_model.fromDocumentSnap(e)).toList();
+    return trophyData;
   }
 
-  Future<Activity_model> getActivityFromId(String id) async{
-    Activity_model model;
-    final DocumentSnapshot activitySnapshot = await FirebaseFirestore.instance.collection("activity").doc(id).get();
-    if(activitySnapshot.exists){
-      final activityData = activitySnapshot.data() as Map<String, dynamic>?;
-      String ida = activitySnapshot.id;
-      String titre = activityData!["titre"] as String;
-      String description = activityData!["description"] as String;
-      String img = activityData!["img"] as String;
-      Timestamp date_debut = activityData!["date_debut"] as Timestamp;
-      Timestamp date_fin = activityData!["date_fin"] as Timestamp;
+  Future<Trophy_model> getTrophyFromId(String id) async{
+    Trophy_model model;
+    final DocumentSnapshot trophySnapshot = await FirebaseFirestore.instance.collection("trophy").doc(id).get();
+    if(trophySnapshot.exists){
+      final trophyData = trophySnapshot.data() as Map<String, dynamic>?;
+      String ida = trophySnapshot.id;
+      String titre = trophyData!["titre"] as String;
+      String description = trophyData!["description"] as String;
+      String img = trophyData!["img"] as String;
+      String code = trophyData!["code"] as String;
 
-      model = Activity_model(id: ida, img: img, titre: titre, description: description, date_debut: date_debut, date_fin: date_fin);
+      model = Trophy_model(id: ida, img: img, titre: titre, description: description, code:code);
 
     }
     else{
-      model = Activity_model(titre: "no titre", description: "no description", date_debut: Timestamp.now(), date_fin: Timestamp.now());
+      model = Trophy_model(titre: "no titre", description: "no description", code: "no code");
     }
 
     return model;
@@ -81,10 +91,10 @@ class Activity_repository {
 
   Future<void> deleteIDAndImage(String id) async {
     try {
-      final DocumentSnapshot activitySnapshot = await FirebaseFirestore.instance.collection("activity").doc(id).get();
-      final activityData = activitySnapshot.data() as Map<String, dynamic>?;
-      String imagePath = activityData!["img"];
-      await _db.collection("activity").doc(id).delete();
+      final DocumentSnapshot trophySnapshot = await FirebaseFirestore.instance.collection("trophy").doc(id).get();
+      final trophyData = trophySnapshot.data() as Map<String, dynamic>?;
+      String imagePath = trophyData!["img"];
+      await _db.collection("trophy").doc(id).delete();
       print("Document supprimé avec succès.");
 
       //on va supprimer l'image également
@@ -98,10 +108,10 @@ class Activity_repository {
 
   Future<void> deleteID(String id) async {
     try {
-      final DocumentSnapshot activitySnapshot = await FirebaseFirestore.instance.collection("activity").doc(id).get();
-      final activityData = activitySnapshot.data() as Map<String, dynamic>?;
-      String imagePath = activityData!["img"];
-      await _db.collection("activity").doc(id).delete();
+      final DocumentSnapshot trophySnapshot = await FirebaseFirestore.instance.collection("trophy").doc(id).get();
+      final trophyData = trophySnapshot.data() as Map<String, dynamic>?;
+      String imagePath = trophyData!["img"];
+      await _db.collection("trophy").doc(id).delete();
       print("Document supprimé avec succès.");
 
     } catch (e) {

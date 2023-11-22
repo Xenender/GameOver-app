@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gameover_app/repository/trophy_user/Trophy_user_model.dart';
+import 'package:gameover_app/repository/trophy_user/Trophy_user_repository.dart';
+import 'package:gameover_app/repository/user_history/User_history_model.dart';
+import 'package:gameover_app/repository/user_history/User_history_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../repository/User_model.dart';
@@ -10,7 +14,9 @@ class QR_afterScan extends StatefulWidget {
 
   String _code="";
 
-  QR_afterScan(this._code);
+  QR_afterScan(this._code){
+
+  }
 
   @override
   _QR_afterScanState createState() => _QR_afterScanState(_code);
@@ -31,6 +37,7 @@ class _QR_afterScanState extends State<QR_afterScan> {
   void initState() {
     super.initState();
     _xpFuture = getXp(); // Initialisation de la variable future dans initState
+
   }
 
   @override
@@ -76,21 +83,64 @@ class _QR_afterScanState extends State<QR_afterScan> {
   }
 
   Future<Text> getXp() async{
+
+    bool isXp = true;
+
     Qr_repository rep = Qr_repository();
     int nbXp = 0;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<Qr_model> listQrModel = await rep.allQr();
+
     for (var element in listQrModel) {
+
+
       if(element.id == _code){
         //code valide
-        nbXp = element.xp??0;
 
-        User_repository rep = User_repository();
 
-        rep.addToUserScore(prefs.getString("userId")??"", nbXp);
 
+        //On teste si c'est un code d'xp ou de trophée
+
+        if(element.xp!.contains("code_")){//code de trophée
+
+          isXp = false;
+
+
+          String code_trophee = element.xp!;
+
+
+
+          //on a l'id du trophee dans code_trophee
+
+          //on ajoute à la table trophy_user la relation user_id, code_trophee
+
+          Trophy_user_model tuModel = Trophy_user_model(user: prefs.getString("userId"), trophy: code_trophee);
+
+          Trophy_user_repository tuRep = Trophy_user_repository();
+          tuRep.createTrophy_user(tuModel);
+
+        }
+        else{//code d'xp
+          isXp = true;
+
+          nbXp = int.parse(element.xp??"0");
+
+          User_repository rep = User_repository();
+
+          String userId = prefs.getString("userId")??"";
+
+          rep.addToUserScore(userId,nbXp);
+
+
+          //ajouter le code à l'historique
+
+          User_history_repository historyrep = User_history_repository();
+          User_history_model historymodel = User_history_model(xp: element.xp??"0", titre: element.titre??"no titre", user: userId);
+
+          historyrep.createHistory(historymodel);
+        }
 
         //supprimer le code de firebase
 
@@ -99,14 +149,26 @@ class _QR_afterScanState extends State<QR_afterScan> {
         Qrrep.deleteQrById(_code);
         _code = '';
 
+
+
+
       }
     }
 
+  if(isXp){
+    return Text(
 
-  return Text(
+      nbXp == 0 ? "QR code non valide..." : "Youpi ! Vous gagnez ${nbXp}xp !",
+      style: TextStyle(fontSize: 24.0),
+    );
+  }
+  else{
+    return Text(
 
-    nbXp == 0 ? "QR code non valide..." : "Youpi ! Vous gagnez ${nbXp}xp !",
-    style: TextStyle(fontSize: 24.0),
-  );
+      "Vous obtenez un trophee !",
+      style: TextStyle(fontSize: 24.0),
+    );
+  }
+
   }
 }

@@ -24,18 +24,16 @@ class _QRScannerPageState extends State<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
+        child: Stack(
           children: <Widget>[
-            Expanded(
-              flex: 5,
-              child: QRView(
+          QRView(
                 key: qrKey,
                 onQRViewCreated: (controller) {
                   this.controller = controller;
                   controller.scannedDataStream.listen((scanData) {
                     if (isCameraActive) {
                       // L'action que vous voulez effectuer lorsque le code QR est scanné
-                      print('Code QR scanné : ${scanData.code}');
+                      print('QR code scanné : ${scanData.code}');
 
                       // Désactive la caméra pour éviter les scans supplémentaires
                       isCameraActive = false;
@@ -57,13 +55,28 @@ class _QRScannerPageState extends State<QRScannerPage> {
                   });
                 },
               ),
+        // Container en bas
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: Container(
+            height: 150,
+
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15)),
+                color: Colors.white
             ),
-            Expanded(
-              flex: 1,
-              child: Center(
-                child: Text('Scannez un code QR:'),
-              ),
+
+
+            child: Center(
+              child: Text('Scannez un QR code généré \n par un administrateur:',textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),
             ),
+          )
+        )
+
+
+
           ],
         ),
       ),

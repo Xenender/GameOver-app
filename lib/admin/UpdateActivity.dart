@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:cached_firestorage/cached_firestorage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover_app/animations/LoadingPage.dart';
@@ -25,6 +26,9 @@ class UpdateActivity extends StatefulWidget {
 
 class _UpdateActivityState extends State<UpdateActivity> {
   String _id = "";
+
+  bool firstStart = true;
+
 
   String title = "";
   String description = "";
@@ -53,6 +57,7 @@ class _UpdateActivityState extends State<UpdateActivity> {
   @override
   void initState() {
     super.initState();
+
 
 
   }
@@ -118,6 +123,8 @@ class _UpdateActivityState extends State<UpdateActivity> {
     chooseImage(ImageSource.gallery).then((value){
       setState(() {
         imagechanged = true;
+        //delete ancienne image du cache
+        CachedFirestorage.instance.removeCacheEntry(mapKey: imageRecup);
       });
 
     });
@@ -145,9 +152,11 @@ class _UpdateActivityState extends State<UpdateActivity> {
               child: Text("Supprimer"),
               onPressed: () {
                 Activity_repository activityrep = Activity_repository();
-                activityrep.deleteIDAndImage(_id);
-                Navigator.pop(context);
-                Navigator.pop(context2,'data');
+                activityrep.deleteIDAndImage(_id).then((value){
+                  Navigator.pop(context);
+                  Navigator.pop(context2,'data');
+                });
+
 
               },
             ),
@@ -193,26 +202,34 @@ class _UpdateActivityState extends State<UpdateActivity> {
             print(acti_model.date_debut);
 
             //Init de toutes les variables en fonction de ce qu'on récup dans la bdd:
+            if(firstStart){
+              firstStart = false;
 
-            title = acti_model.titre??"no titre";
-            description = acti_model.description??"no description";
-            Timestamp timestamp_debut = acti_model.date_debut??Timestamp.now();
-            Timestamp timestamp_fin = acti_model.date_fin??Timestamp.now();
+              title = acti_model.titre??"no titre";
+              description = acti_model.description??"no description";
+              Timestamp timestamp_debut = acti_model.date_debut??Timestamp.now();
+              Timestamp timestamp_fin = acti_model.date_fin??Timestamp.now();
 
-            DateTime dataTime1_debut = DateTime.fromMillisecondsSinceEpoch(timestamp_debut.millisecondsSinceEpoch);
-            DateTime dataTime1_fin = DateTime.fromMillisecondsSinceEpoch(timestamp_fin.millisecondsSinceEpoch);
-            //A CONTINUER !!!!!!!!!!!!!!!!!
+              DateTime dataTime1_debut = DateTime.fromMillisecondsSinceEpoch(timestamp_debut.millisecondsSinceEpoch);
+              DateTime dataTime1_fin = DateTime.fromMillisecondsSinceEpoch(timestamp_fin.millisecondsSinceEpoch);
 
-            startTime = TimeOfDay.fromDateTime(dataTime1_debut);
-            endTime = TimeOfDay.fromDateTime(dataTime1_fin);
+              startTime = TimeOfDay.fromDateTime(dataTime1_debut);
+              endTime = TimeOfDay.fromDateTime(dataTime1_fin);
 
-            startDate = dataTime1_debut;
-            endDate = dataTime1_fin;
+              startDate = dataTime1_debut;
+              endDate = dataTime1_fin;
 
-            imageRecup = acti_model.img??"";
+              imageRecup = acti_model.img??"";
 
-            precedentFilePath = acti_model.img??"";
-            //FIN RECUP DONNES
+              print("image recup");
+              print(imageRecup);
+
+              precedentFilePath = acti_model.img??"";
+              //FIN RECUP DONNES
+
+            }
+
+
 
 
             return Padding(
@@ -278,18 +295,10 @@ class _UpdateActivityState extends State<UpdateActivity> {
                           :Container(width: 0,height: 0,),
                       
                       !imagechanged?
-                        FutureBuilder<String>(
 
-                        future: getUrlDownload(imageRecup),
-                        builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child:CircularProgressIndicator()); // En attendant la résolution de la future
-                        } else if (snapshot.hasError) {
-                        print('Erreur : ${snapshot.error}');
-                        return Container(width: 0,height: 0,);
-                        } else {
-                          return Container(height: 200,width: MediaQuery.of(context).size.width,child: Image.network(snapshot.data??"",fit: BoxFit.cover,));
-                        }})
+                            Container(height: 200,width: MediaQuery.of(context).size.width,child: RemotePictureUp(imagePath: imageRecup, mapKey: imageRecup,fit: BoxFit.cover,) )
+
+
                           : Container(width: 0,height: 0,),
 
 
@@ -364,23 +373,17 @@ class _UpdateActivityState extends State<UpdateActivity> {
                                 storage_service.uploadFile(image!,idActi).then((value) {
                                   print("upload fait !");
                                   Navigator.pop(context);
-                                  Navigator.pop(context);
+                                  Navigator.pop(context,"data");
                                 });}
                             }
                             else{
                               //on conserve l'image
-                              activityrep.deleteID(_id);
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                              activityrep.deleteID(_id).then((value){
+                                Navigator.pop(context);
+                                Navigator.pop(context,"data");
+                              });
+
                             }
-
-
-
-
-
-
-
-
 
 
                           }

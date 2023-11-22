@@ -1,38 +1,47 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Activity_model{
+class Trophy_model{
   String? id;
   String? titre;
   String? description;
-  Timestamp? date_debut;
-  Timestamp? date_fin;
   String? img;
+  String? code;
 
-  Activity_model({this.id,this.img,required this.titre,required this.description,required this.date_debut,required this.date_fin}){
+  Trophy_model({this.id,this.img,required this.titre,required this.description, this.code}){
 
+      /*if(this.code == null){
+        //generer code
+        int min = 1000;
+        int max = 100000;
+        Random random = Random();
+        int randomNumber = min + random.nextInt(max - min + 1);
 
+        // Conversion du nombre en une chaîne de caractères
+        String randomString = randomNumber.toString();
+        this.code = "trophy_${randomString}";
+      }
+
+       */
   }
 
   toJson(){
     return {
       "titre":titre,
       "description":description,
-      "date_debut":date_debut,
-      "date_fin":date_fin,
+      "code":code,
     };
   }
 
-  factory Activity_model.fromDocumentSnap(DocumentSnapshot<Map<String, dynamic>> document){
+  factory Trophy_model.fromDocumentSnap(DocumentSnapshot<Map<String, dynamic>> document){
     final data = document.data();
-    return Activity_model(
+    return Trophy_model(
       id: document.id,
       img: data?["img"],
       titre: data?["titre"],
       description: data?["description"],
-      date_debut: data?["date_debut"],
-      date_fin: data?["date_fin"]
-
-
+      code: data?["code"],
 
     );
   }

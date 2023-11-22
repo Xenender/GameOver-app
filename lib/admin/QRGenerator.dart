@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gameover_app/repository/Activity_model.dart';
+import 'package:gameover_app/repository/Activity_repository.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../repository/qr/Qr_model.dart';
@@ -14,6 +16,31 @@ class _QRGeneratorState extends State<QRGenerator> {
   int _qrCodeData = 0;
   String _randomQRCode = '';
   int _qrCodeDataShow = 0;
+
+  TextEditingController _controller = TextEditingController();
+  List<String> listeActivitySuggestion = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    initVariables();
+
+
+  }
+
+  void initVariables () async {
+    Activity_repository acti_rep = Activity_repository();
+    List<Activity_model> listeActivity = await acti_rep.allActivity();
+    List<String> listeActivityName = [];
+    for(Activity_model a in listeActivity){
+      listeActivityName.add(a.titre??"");
+    }
+    setState(() {
+      listeActivitySuggestion = listeActivityName;
+    });
+  }
+
 
   @override
   void dispose() {
@@ -65,15 +92,17 @@ class _QRGeneratorState extends State<QRGenerator> {
             ),
             // Partie inférieure (30%)
             Container(
-              height: MediaQuery.of(context).size.height * 0.2,
+
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text("Nombre d'XP :", textAlign: TextAlign.center),
-                  Container(
-                    width: 200.0,
+
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
                     child: TextField(
-                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        labelText: "Nombre d'XP"),
+
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         setState(() {
@@ -82,16 +111,36 @@ class _QRGeneratorState extends State<QRGenerator> {
                       },
                     ),
                   ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _controller,
+                          decoration: InputDecoration(
+                            labelText: 'Intitulé',
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.arrow_drop_down),
+                              onPressed: () {
+                                _showSuggestions();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
-                      if (_qrCodeData != 0 && !_generating) {
+                      if (_qrCodeData != 0 && !_generating && _controller.text != "") {
                         _generating = true;
                         if (_randomQRCode.isNotEmpty) {
                           Qr_repository rep = Qr_repository();
                           rep.deleteQrById(_randomQRCode);
                           _randomQRCode = '';
                         }
-                        Qr_model qr_code = Qr_model(xp: _qrCodeData);
+                        Qr_model qr_code = Qr_model(xp: _qrCodeData.toString(),titre: _controller.text);
                         sendDataAndGenerateCode(qr_code);
                       }
                     },
@@ -113,4 +162,28 @@ class _QRGeneratorState extends State<QRGenerator> {
     String idQr = await rep.createQr(qr_code); // Envoyer les données à Firestore
     _generateQRCode(idQr);
   }
+
+
+  void _showSuggestions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView.builder(
+          itemCount: listeActivitySuggestion.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(listeActivitySuggestion[index]),
+              onTap: () {
+                // Mettez à jour le champ de texte avec la suggestion sélectionnée
+                _controller.text = listeActivitySuggestion[index];
+                // Fermez la feuille de bottom sheet
+                Navigator.pop(context);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
 }

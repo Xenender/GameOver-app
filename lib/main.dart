@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover_app/animations/LoadingPage.dart';
 import 'package:gameover_app/home/NamePage.dart';
+import 'package:gameover_app/repository/User_model.dart';
+import 'package:gameover_app/repository/User_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
@@ -62,10 +64,30 @@ class MyApp extends StatelessWidget {
 
   Future<bool> userConnected() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print("player prefs");
 
-    print(prefs.getString("userId"));
-    return prefs.getString("userId") != null;
+    if(prefs.getString("userId") != null){
+
+      User_repository user_rep = User_repository();
+      List<User_model> userList = await user_rep.allUser();
+      bool userExist = false;
+      for(User_model model in userList){
+        if(model.id == prefs.getString("userId")){
+          userExist = true;
+        }
+      }
+      if(userExist){
+        return true;
+      }
+      else{//l'user n'existe pas dans la bdd on le supprime
+        prefs.remove("userId");
+        prefs.remove("username");
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
+
   }
 }
 

@@ -1,6 +1,7 @@
 
 import 'package:cached_firestorage/lib.dart';
 import 'package:flutter/material.dart';
+import 'package:gameover_app/animations/ScrollBehavior1.dart';
 import 'package:gameover_app/global/GlobalVariable.dart';
 import 'package:gameover_app/hub/Profile_menu.dart';
 import 'package:gameover_app/hub/Settings_menu.dart';
@@ -55,93 +56,16 @@ class _HubEventsState extends State<HubEvents>{
 
           body:
           Container(
-              padding: EdgeInsetsDirectional.only(top: 40,start: 20,end: 20,bottom: 0),
-              child: Column(
+            color: Colors.white,
+              padding: EdgeInsetsDirectional.only(top:0,start: 0,end: 0,bottom: 0),
+              child: Stack(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(onPressed: (){
 
-
-
-
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            GlobalVariable.toolContext = context; // Enregistrez le contexte du menu de paramètres
-                            return Settings_menu(); // Affichez votre menu de paramètres ici
-                          },
-                        ).then((value){
-                          if(value != null){
-                            setState(() {
-                              print("reload from settings");
-                              //actualiser la page apres un pop avec passage de données
-                            });
-                          }
-                        });
-
-                      }, icon: Icon(Icons.settings),
-                        iconSize: 50,
-                      ),
-
-                      GestureDetector(child: FutureBuilder<Container>(
-                        future: pdp(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // En attendant la résolution de la future
-                          } else if (snapshot.hasError) {
-                            print('Erreur : ${snapshot.error}');
-                            return Container(width: 0,height: 0,);
-                          } else {
-                            return snapshot.data??Column(children: []);
-                          }
-                        },
-                      ),
-                        onTap: (){
-                          showModalBottomSheet(
-                            context: context,
-                              isScrollControlled:true,
-                            builder: (context) {
-                              GlobalVariable.toolContext = context; // Enregistrez le contexte du menu de paramètres
-                              return ProfileMenu(); // Affichez votre menu de paramètres ici
-                            },
-                          ).then((value){
-                            if(value != null){
-                              setState(() {
-                                //actualiser la page apres un pop avec passage de données
-                              });
-                            }
-                          });
-                        },
-                      )
-
-                    ],
-                  ),
-                  //APRES FIRST ROW
-                  /*
-              ElevatedButton(onPressed: () async{
-                SharedPreferences preferences = await SharedPreferences.getInstance();
-                await preferences.remove('userId');
-                print("ID removed");
-              }, child: Text("Delete prefs")),
-
-               */
-
-                ElevatedButton(onPressed: () async {
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  prefs.remove("userId");
-                  prefs.remove("username");
-                }, child: Text("del prefs"))
-                  ,
-
-                  Expanded(
-                      child:
                       SingleChildScrollView(
                         child: Column(
                           children: [
-
-                            FutureBuilder<Column>(
+                            Padding(padding: EdgeInsetsDirectional.only(top: 50),
+                            child: FutureBuilder<Column>(
 
                               future: activityList(),
                               builder: (context, snapshot) {
@@ -155,12 +79,120 @@ class _HubEventsState extends State<HubEvents>{
                                 }
                               },
                             ),
+                            )
+
 
 
                           ],
                         ),
                       )
-                  )
+
+                  ,
+
+                  //FIRST ROW
+                  Container(
+                    padding: EdgeInsetsDirectional.only(top:40),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10)),
+                      color: Colors.white.withOpacity(0.9)
+                    ),
+
+                    child: Row(
+
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(onPressed: (){
+
+
+
+
+                          showModalBottomSheet(
+                            context: context,
+
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(30.0),
+                              ),
+                            ),
+
+                            builder: (context) {
+                              GlobalVariable.toolContext = context; // Enregistrez le contexte du menu de paramètres
+                              return Settings_menu(); // Affichez votre menu de paramètres ici
+                            },
+                          ).then((value){
+                            if(value != null){
+                              setState(() {
+                                print("reload from settings");
+                                //actualiser la page apres un pop avec passage de données
+                              });
+                            }
+                          });
+
+                        }, icon: Icon(Icons.settings),
+                          iconSize: 55,
+                        ),
+
+                        GestureDetector(child: FutureBuilder<Container>(
+                          future: pdp(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator(); // En attendant la résolution de la future
+                            } else if (snapshot.hasError) {
+                              print('Erreur : ${snapshot.error}');
+                              return Container(width: 0,height: 0,);
+                            } else {
+                              return snapshot.data??Column(children: []);
+                            }
+                          },
+                        ),
+                          onTap: (){
+
+                            showModalBottomSheet(
+
+
+
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(30.0),
+                                ),
+                              ),
+                              context: context,
+                              constraints: BoxConstraints(
+                                maxHeight: MediaQuery.of(context).size.height * 0.80, // Définissez la hauteur maximale souhaitée
+                              ),
+                              isScrollControlled:true,
+                              builder: (context) {
+                                GlobalVariable.toolContext = context; // Enregistrez le contexte du menu de paramètres
+                                return ScrollConfiguration(
+                                  behavior: ScrollBehavior1(), // Utilisez un ScrollBehavior personnalisé
+                                  child: ProfileMenu(), // Affichez votre menu de paramètres ici
+                                );
+                              },
+                            ).then((value){
+                              if(value != null){
+                                setState(() {
+                                  //actualiser la page apres un pop avec passage de données
+                                });
+                              }
+                            });
+                          },
+                        )
+
+                      ],
+                    ),
+                  ),
+
+                  //APRES FIRST ROW
+                  /*
+              ElevatedButton(onPressed: () async{
+                SharedPreferences preferences = await SharedPreferences.getInstance();
+                await preferences.remove('userId');
+                print("ID removed");
+              }, child: Text("Delete prefs")),
+
+               */
+
+
 
                 ],
               )
@@ -187,8 +219,9 @@ class _HubEventsState extends State<HubEvents>{
 
 
     Container futureImage = Container(
-      width: 60,  // 2x le rayon de l'avatar (pour inclure le contour)
-      height: 60, // 2x le rayon de l'avatar (pour inclure le contour)
+
+      width: 55,  // 2x le rayon de l'avatar (pour inclure le contour)
+      height: 55, // 2x le rayon de l'avatar (pour inclure le contour)
       decoration: BoxDecoration(
         shape: BoxShape.circle, // pour rendre le conteneur rond
         border: Border.all(
@@ -205,7 +238,7 @@ class _HubEventsState extends State<HubEvents>{
       ),
     );
 
-    return Container(child: futureImage,);
+    return Container(child: futureImage,padding: EdgeInsetsDirectional.only(end: 15),);
   }
 
 
@@ -216,23 +249,34 @@ class _HubEventsState extends State<HubEvents>{
     Storage_service storage = Storage_service();
 
     List<Activity_model> listActivityModel = await activity.allActivity();
-    List<Column> lstRow = [];
+    List<Padding> lstRow = [];
     listActivityModel.forEach((element) {
 
       print("ELEMENT IMG");
       print(element.img);
       Container futureContainer = Container(
+
         width: screenWidth,
-        height: 150,
+        height: 400,
         child: RemotePictureUp(
           imagePath: element.img!,
           mapKey: element.img??'0',
           fit: BoxFit.cover,
+
         ),
 
       );
 
 
+      String deb_mois = element.date_debut!.toDate().month.toString();
+      String deb_jour =element.date_debut!.toDate().day.toString();
+      String deb_heure = element.date_debut!.toDate().hour.toString();
+      String deb_minute = element.date_debut!.toDate().minute.toString();
+
+      String fin_mois = element.date_fin!.toDate().month.toString();
+      String fin_jour =element.date_fin!.toDate().day.toString();
+      String fin_heure = element.date_fin!.toDate().hour.toString();
+      String fin_minute = element.date_fin!.toDate().minute.toString();
 
 
       lstRow.add(
@@ -242,31 +286,44 @@ class _HubEventsState extends State<HubEvents>{
           children: [Text(element.titre??"Titre"),futureContainer,Text(element.description??"Description")])
 
            */
-          Column(
-            children: [
-              Text(
-                element.titre ?? "Titre",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10), // Espacement entre le titre et l'image
-              futureContainer, // Remplacez "element.image" par l'URL de votre image
-              SizedBox(height: 10), // Espacement entre l'image et la description
-              Text(
-                element.description ?? "Description",
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 10), // Espacement entre la description et les dates
+          Padding(padding: EdgeInsetsDirectional.only(top: 70),
+            child:
+            Column(
+              children: [
+                Padding(padding: EdgeInsetsDirectional.only(start: 10,end: 10),
+                  child:
+                  Text(
+                    element.titre ?? "Titre",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold,),
+                  ),),
 
+                SizedBox(height: 10), // Espacement entre le titre et l'image
+                futureContainer, // Remplacez "element.image" par l'URL de votre image
+                SizedBox(height: 10), // Espacement entre l'image et la description
+                Padding(padding: EdgeInsetsDirectional.only(start: 10,end: 10),
+                  child:
                   Text(
-                    'Date de début: ${DateTime.fromMillisecondsSinceEpoch(element.date_debut!.millisecondsSinceEpoch)}',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  Text(
-                    'Date de fin: ${DateTime.fromMillisecondsSinceEpoch(element.date_fin!.millisecondsSinceEpoch)}',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
+
+                    element.description ?? "Description",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),),
+
+                SizedBox(height: 10), // Espacement entre la description et les dates
+
+                Text(
+                  'Début: ${deb_jour}/${deb_mois}  ${deb_heure}:${deb_minute}',
+                  style: TextStyle(fontSize: 18),
+                ),
+                Text(
+                  'Fin: ${fin_jour}/${fin_mois}  ${fin_heure}:${fin_minute}',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
+            )
+
 
 
       );
