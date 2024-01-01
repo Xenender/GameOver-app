@@ -1,0 +1,17 @@
+Map<int, String> indices = {
+  1: "L'arme",
+  2: "Le lieu",
+  3: "Le mobile",
+  4: "Un autre indice",
+  5: "Le dernier indice",
+  7: "L'arme",
+  6: "Le lieu",
+  8: "Le mobile",
+  9: "Un autre indice",
+  10: "Le dernier indice",
+  11: "L'arme",
+  12: "Le lieu",
+  13: "Le mobile",
+  14: "Un autre indice",
+  15: "Le dernier indice",
+};

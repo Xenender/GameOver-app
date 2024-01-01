@@ -6,6 +6,7 @@ import 'package:gameover_app/animations/LoadingPage.dart';
 import 'package:gameover_app/home/NamePage.dart';
 import 'package:gameover_app/repository/User_model.dart';
 import 'package:gameover_app/repository/User_repository.dart';
+import 'package:gameover_app/themes/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
@@ -19,7 +20,7 @@ Future<void> main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  CachedFirestorage.instance.cacheTimeout = 180;
+  CachedFirestorage.instance.cacheTimeout = 900;
 
 
   runApp(const MyApp());
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: AppTheme.lightTheme,
       title: "GameOverApp",
       debugShowCheckedModeBanner: false,
       home:

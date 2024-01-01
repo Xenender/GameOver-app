@@ -85,6 +85,7 @@ class _QR_afterScanState extends State<QR_afterScan> {
   Future<Text> getXp() async{
 
     bool isXp = true;
+    bool isIndice = false;
 
     Qr_repository rep = Qr_repository();
     int nbXp = 0;
@@ -106,6 +107,7 @@ class _QR_afterScanState extends State<QR_afterScan> {
         if(element.xp!.contains("code_")){//code de trophée
 
           isXp = false;
+          isIndice = false;
 
 
           String code_trophee = element.xp!;
@@ -122,24 +124,44 @@ class _QR_afterScanState extends State<QR_afterScan> {
           tuRep.createTrophy_user(tuModel);
 
         }
-        else{//code d'xp
-          isXp = true;
+        else{
 
-          nbXp = int.parse(element.xp??"0");
-
-          User_repository rep = User_repository();
-
-          String userId = prefs.getString("userId")??"";
-
-          rep.addToUserScore(userId,nbXp);
+          if(element.xp!.contains("indice")){//code d'indices
+            isXp = false;
+            isIndice = true;
 
 
-          //ajouter le code à l'historique
+            String code_indice = element.xp!;
 
-          User_history_repository historyrep = User_history_repository();
-          User_history_model historymodel = User_history_model(xp: element.xp??"0", titre: element.titre??"no titre", user: userId);
 
-          historyrep.createHistory(historymodel);
+            //on ajoute la shared pref
+
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+
+            prefs.setBool(code_indice, true);
+          }
+          else{//code d'xp
+            isXp = true;
+            isIndice = false;
+
+            nbXp = int.parse(element.xp??"0");
+
+            User_repository rep = User_repository();
+
+            String userId = prefs.getString("userId")??"";
+
+            rep.addToUserScore(userId,nbXp);
+
+
+            //ajouter le code à l'historique
+
+            User_history_repository historyrep = User_history_repository();
+            User_history_model historymodel = User_history_model(xp: element.xp??"0", titre: element.titre??"no titre", user: userId);
+
+            historyrep.createHistory(historymodel);
+          }
+
+
         }
 
         //supprimer le code de firebase
@@ -163,11 +185,21 @@ class _QR_afterScanState extends State<QR_afterScan> {
     );
   }
   else{
-    return Text(
+    if(isIndice){
+      return Text(
 
-      "Vous obtenez un trophee !",
-      style: TextStyle(fontSize: 24.0),
-    );
+        "Vous obtenez un indice !",
+        style: TextStyle(fontSize: 24.0),
+      );
+    }
+    else{
+      return Text(
+
+        "Vous obtenez un trophee !",
+        style: TextStyle(fontSize: 24.0),
+      );
+    }
+
   }
 
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gameover_app/admin/QRGenerator.dart';
+import 'package:gameover_app/admin/admin_murder/MurderQr.dart';
 import 'package:gameover_app/admin/trophees/TrophyManagerPage.dart';
 
 import 'ActivityManagerPage.dart';
@@ -27,20 +28,6 @@ class AdminHub extends StatelessWidget {
               child: Text('Administrer les événements'),
             ),
             Spacer(), // Espace entre les boutons
-            ElevatedButton(
-              onPressed: () {
-                // Action pour "Générer un QR code"
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => QRGenerator()),
-                );
-
-
-              },
-              child: Text('Générer un QR code'),
-            ),
-            Spacer(), // Espace du bas
 
             ElevatedButton(
               onPressed: () {
@@ -54,6 +41,37 @@ class AdminHub extends StatelessWidget {
 
               },
               child: Text('Administrer les trophées'),
+            ),
+            Spacer(),
+
+            ElevatedButton(
+              onPressed: () {
+                // Action pour "Générer un QR code"
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => QRGenerator()),
+                );
+
+
+              },
+              child: Text("Donner de l'xp"),
+            ),
+            Spacer(), // Espace du bas
+
+
+            ElevatedButton(
+              onPressed: () {
+                // Action pour "Générer un QR code"
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MurderQr()),
+                );
+
+
+              },
+              child: Text('Donner un indice (murder)'),
             ),
             Spacer(),
           ],

@@ -1,4 +1,4 @@
-package com.gameover.app.gameover_app;
+package com.xenender.gameover;
 
 import io.flutter.embedding.android.FlutterActivity;
 

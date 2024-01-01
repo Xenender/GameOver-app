@@ -13,6 +13,7 @@ import 'package:gameover_app/repository/trophy_user/Trophy_user_repository.dart'
 import 'package:gameover_app/repository/user_history/User_history_model.dart';
 import 'package:gameover_app/repository/user_history/User_history_repository.dart';
 import 'package:gameover_app/updatedLIBS/remote_picture_up.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,6 +33,8 @@ class _ProfileMenuState extends State<ProfileMenu> {
   String _userId = "";
   RemotePictureUp? imageRemote = null;
 
+  String _currentScore = "";
+
   ImagePicker picker = ImagePicker();
   File? image;
 
@@ -47,7 +50,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
   Map<String, List<String>> tableauAssociatifTrophy = {};
 
   //tabHistory
-  List<Text> tabHistorique = [];
+  List<Padding> tabHistorique = [];
 
   List<GestureDetector> imageTropheesList = [];
 
@@ -80,6 +83,8 @@ class _ProfileMenuState extends State<ProfileMenu> {
 
     User_repository user_repository = User_repository();
     String? imagePath = await user_repository.getUserImagePath(_userId);
+    int? scorr = await user_repository.getUserScore(_userId);
+    _currentScore = scorr.toString();
 
     setState(() {
       imageRemote = RemotePictureUp(imagePath:imagePath!,mapKey: imagePath!,fit: BoxFit.cover,useAvatarView: true,
@@ -132,13 +137,45 @@ class _ProfileMenuState extends State<ProfileMenu> {
     User_history_repository historyRep = User_history_repository();
     List<User_history_model> listHistoryModel = await historyRep.allHistory();
 
-    List<Text> tabHistorique2 = [];
+    List<Padding> tabHistorique2 = [];
     for(User_history_model model in listHistoryModel)
       {
         if(model.user == _userId){
           //appartient à son historique
-          String text = "+ ${model.titre}: ${model.xp}Xp";
-          tabHistorique2.add(Text(text));
+          String text = "${model.titre}: + ${model.xp}Xp";
+          tabHistorique2.add(
+
+              Padding(padding: EdgeInsets.only(left: 20),child:
+
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children:
+                  [
+                    Icon(
+
+                      Icons.fiber_manual_record, // Remplacez ceci par l'icône de votre choix
+                      color: Theme.of(context).colorScheme.secondary,
+                      size: 12,
+                    ),
+                    SizedBox(width: 8), // Espacement entre l'icône et le texte
+
+                    Text(text,style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+
+                    )
+
+                  ]
+              )
+
+                ,)
+
+            );
+
         }
       }
     setState(() {
@@ -175,7 +212,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.black12,
+                    color: Theme.of(context).colorScheme.secondary,
                     width: 2.0,
                   ),
                 ),
@@ -260,7 +297,8 @@ class _ProfileMenuState extends State<ProfileMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
+    return
+      DraggableScrollableSheet(
       initialChildSize: 0.9,
       minChildSize: 0.1,
       maxChildSize: 0.9,
@@ -268,203 +306,247 @@ class _ProfileMenuState extends State<ProfileMenu> {
         return Container(
           color: Colors.white,
           child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
+            child:
+
                 Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child:
-                  GestureDetector(
-                    onTap: () {
-                      print("Cliquez pour modifier l'image");
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child:
+                          GestureDetector(
+                            onTap: () {
+                              print("Cliquez pour modifier l'image");
 
-                      chooseImage(ImageSource.gallery);
+                              chooseImage(ImageSource.gallery);
 
-                      // Insérez le code pour changer l'image ici
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.black12,
-                              width: 2.0,
+                              // Insérez le code pour changer l'image ici
+                            },
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.black12,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  child: image ==  null
+                                      ?
+                                  imageRemote
+                                      :
+                                  ClipOval(child: Image.file(image!,fit: BoxFit.cover,))
+
+                                  ,
+                                ),
+                                Positioned(
+                                  bottom: 0, // Positionnez le logo au bas de l'image
+                                  right: 0, // Positionnez le logo à droite de l'image
+                                  child: Container(
+                                    width: 40, // Ajustez la taille du conteneur du logo selon vos préférences
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.black12,
+                                        width: 2.0,
+                                      ),
+                                      color: Colors.white, // Fond blanc du logo stylo
+                                    ),
+                                    child: Icon(
+                                      Icons.edit, // Utilisez l'icône du stylo (vous pouvez en choisir un autre si vous préférez)
+                                      color: Theme.of(context).colorScheme.secondary, // Couleur de l'icône du stylo
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          child: image ==  null
-                                 ?
-                                    imageRemote
-                                 :
-                          ClipOval(child: Image.file(image!,fit: BoxFit.cover,))
+                          )
 
-                          ,
+
+
+
+                      ),
+                      SizedBox(height: 10.0),
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+
+                            Text(
+                              "$_currentScore xp",
+                              style: TextStyle(fontSize: 22.0),
+                            ),
+
+
+                          ],
                         ),
-                        Positioned(
-                          bottom: 0, // Positionnez le logo au bas de l'image
-                          right: 0, // Positionnez le logo à droite de l'image
-                          child: Container(
-                            width: 40, // Ajustez la taille du conteneur du logo selon vos préférences
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.black12,
-                                width: 2.0,
+                      ),
+
+                      SizedBox(height: 10.0),
+                      _isEditable
+                          ? Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: TextField(
+                                controller: _pseudoController,
+
+                                decoration: InputDecoration(
+                                  labelText: 'Pseudo',
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
-                              color: Colors.white, // Fond blanc du logo stylo
                             ),
-                            child: Icon(
-                              Icons.edit, // Utilisez l'icône du stylo (vous pouvez en choisir un autre si vous préférez)
-                              color: Colors.blue, // Couleur de l'icône du stylo
+                            IconButton(
+                              icon: Icon(Icons.check),
+                              onPressed: () async {
+
+                                //check pseudo valide
+
+                                if(_pseudoController!.text != "" && _pseudoController!.text != _currentPseudo){
+
+
+                                  setState(() {
+                                    _isEditable = false;
+                                    _currentPseudo = _pseudoController!.text;
+
+                                  });
+
+                                }
+                                else{
+                                  setState(() {
+                                    _isEditable = false;
+
+                                  });
+                                }
+
+                                //enregister pseudo
+
+
+
+
+                              },
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  )
-
-
-
-
-                ),
-                SizedBox(height: 10.0),
-                _isEditable
-                    ? Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextField(
-                          controller: _pseudoController,
-
-                          decoration: InputDecoration(
-                            labelText: 'Pseudo',
-                            border: OutlineInputBorder(),
-                          ),
+                      )
+                          : Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                _currentPseudo,
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit,color: Theme.of(context).colorScheme.secondary,),
+                              onPressed: () {
+                                setState(() {
+                                  _isEditable = true;
+                                });
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.check),
-                        onPressed: () async {
 
-                          //check pseudo valide
-
-                          if(_pseudoController!.text != "" && _pseudoController!.text != _currentPseudo){
+                      ElevatedButton(
 
 
-                            setState(() {
-                              _isEditable = false;
-                              _currentPseudo = _pseudoController!.text;
+                          onPressed: (){
+                        updateChanges();
 
-                            });
+                      }, child: Text("Modifier"))
+                      // Ajoutez cette partie sous le bouton "Modifier"
+                      ,
+                      Padding(padding: EdgeInsets.only(top: 25,bottom: 16,left: 16,right: 16),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.star, // Utilisez l'icône de votre choix
+                              color: Theme.of(context).colorScheme.primary, // Couleur de l'icône
+                              size: 40, // Taille de l'icône
+                            ),
+                            SizedBox(width: 10), // Espace entre l'icône et le texte
+                            Text(
+                              "Trophées",
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: -1.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      ,
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Container(
 
-                          }
-                          else{
-                            setState(() {
-                              _isEditable = false;
+                            height: 80, // Ajustez la hauteur en fonction de votre mise en page
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
 
-                            });
-                          }
-
-                          //enregister pseudo
-
-
-
-
-                        },
+                                children: imageTropheesList,
+                              ),
+                            )
+                        ),
                       ),
+
+                      Padding(padding: EdgeInsets.only(top: 25,bottom: 16,left: 16,right: 16),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.history, // Utilisez l'icône de votre choix
+                              color: Theme.of(context).colorScheme.primary, // Couleur de l'icône
+                              size: 40, // Taille de l'icône
+                            ),
+                            SizedBox(width: 10), // Espace entre l'icône et le texte
+                            Text(
+                              "Historique",
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.w600,
+                                    letterSpacing: -1.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+
+
+                      Padding(padding: EdgeInsets.only(bottom: 100),child: Column(
+
+                          children:
+
+
+                          tabHistorique
+
+                      ),)
+
+
+
+
                     ],
                   ),
                 )
-                    : Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          _currentPseudo,
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.edit,color: Colors.blue,),
-                        onPressed: () {
-                          setState(() {
-                            _isEditable = true;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
 
-                ElevatedButton(onPressed: (){
-                  updateChanges();
-
-                }, child: Text("Modifier"))
-                // Ajoutez cette partie sous le bouton "Modifier"
-                ,
-                Padding(padding: EdgeInsets.only(top: 25,bottom: 16,left: 16,right: 16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.star, // Utilisez l'icône de votre choix
-                        color: Colors.yellow, // Couleur de l'icône
-                        size: 30, // Taille de l'icône
-                      ),
-                      SizedBox(width: 10), // Espace entre l'icône et le texte
-                      Text(
-                        "Trophées",
-                        style: TextStyle(fontSize: 35),
-                      ),
-                    ],
-                  ),
-                )
-                ,
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Container(
-
-                    height: 80, // Ajustez la hauteur en fonction de votre mise en page
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-
-                        children: imageTropheesList,
-                      ),
-                    )
-                  ),
-                ),
-
-                Padding(padding: EdgeInsets.only(top: 25,bottom: 16,left: 16,right: 16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.history, // Utilisez l'icône de votre choix
-                        color: Colors.yellow, // Couleur de l'icône
-                        size: 30, // Taille de l'icône
-                      ),
-                      SizedBox(width: 10), // Espace entre l'icône et le texte
-                      Text(
-                        "Historique",
-                        style: TextStyle(fontSize: 35),
-                      ),
-                    ],
-                  ),
-                ),
-
-
-
-                Column(
-                  children: tabHistorique,
-                )
-
-
-
-              ],
-            ),
           ),
         );
       },

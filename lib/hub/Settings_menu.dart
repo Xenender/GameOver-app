@@ -28,7 +28,10 @@ class Settings_menu extends StatelessWidget {
                     title: Text('Politique de confidentialité'),
                     onTap: () async{
                       print("fcttt");
-                      final Uri url = Uri.https('www.google.com');
+                      final Uri url = Uri.https(
+                        "doc-hosting.flycricket.io",
+                        "/gameover-privacy-policy/6b64b1a0-b770-4b11-aa24-d74aea23d533/privacy",
+                      );
                       try{
                         await launchUrl(url);
                       }

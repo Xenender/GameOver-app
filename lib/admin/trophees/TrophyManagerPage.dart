@@ -86,6 +86,7 @@ class _TrophyManagerPageState extends State<TrophyManagerPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
+
         onPressed: () {
           // Ajoutez ici votre logique pour ajouter une activité
           Navigator.push(context, MaterialPageRoute(builder: (context) => CreateTrophy())).then((value){

@@ -6,6 +6,7 @@ import 'package:gameover_app/global/GlobalVariable.dart';
 import 'package:gameover_app/hub/Profile_menu.dart';
 import 'package:gameover_app/hub/Settings_menu.dart';
 import 'package:gameover_app/leaderboard/Leaderboard.dart';
+import 'package:gameover_app/murder/Murder_home.dart';
 import 'package:gameover_app/repository/Activity_model.dart';
 import 'package:gameover_app/repository/Activity_repository.dart';
 import 'package:gameover_app/repository/Storage_service.dart';
@@ -64,7 +65,20 @@ class _HubEventsState extends State<HubEvents>{
                       SingleChildScrollView(
                         child: Column(
                           children: [
-                            Padding(padding: EdgeInsetsDirectional.only(top: 50),
+
+                            /*
+
+                            Padding(padding: EdgeInsetsDirectional.only(top: 120,),child: ElevatedButton(onPressed: (){
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Murder_home(),
+                                  ));
+                            }, child: Text("murder page")),)
+                            ,
+
+                             */
+                            Padding(padding: EdgeInsetsDirectional.only(top: 50,bottom: 100),
                             child: FutureBuilder<Column>(
 
                               future: activityList(),
@@ -90,6 +104,7 @@ class _HubEventsState extends State<HubEvents>{
                   ,
 
                   //FIRST ROW
+
                   Container(
                     padding: EdgeInsetsDirectional.only(top:40),
                     decoration: BoxDecoration(
@@ -183,14 +198,8 @@ class _HubEventsState extends State<HubEvents>{
                   ),
 
                   //APRES FIRST ROW
-                  /*
-              ElevatedButton(onPressed: () async{
-                SharedPreferences preferences = await SharedPreferences.getInstance();
-                await preferences.remove('userId');
-                print("ID removed");
-              }, child: Text("Delete prefs")),
 
-               */
+
 
 
 
