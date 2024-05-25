@@ -87,7 +87,12 @@ class _ProfileMenuState extends State<ProfileMenu> {
     _currentScore = scorr.toString();
 
     setState(() {
-      imageRemote = RemotePictureUp(imagePath:imagePath!,mapKey: imagePath!,fit: BoxFit.cover,useAvatarView: true,
+      imageRemote = RemotePictureUp(
+        imagePath:imagePath!,
+        mapKey: imagePath!,
+        placeholder:"lib/images/no-image-icon-23485.png",
+        fit: BoxFit.cover,
+        useAvatarView: true,
         avatarViewRadius: 100,);
     });
 
@@ -221,6 +226,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
                       ? RemotePictureUp(
                     imagePath: trophies[index].img!,
                     mapKey: trophies[index].img!,
+                    placeholder:"lib/images/no-image-icon-23485.png",
                     fit: BoxFit.cover,
                     useAvatarView: true,
                     avatarViewRadius: 60, // Ajustez la taille du cercle ici
@@ -266,6 +272,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
                 imagePath: trophies[index].img!,
                 mapKey: trophies[index].img!,
                 fit: BoxFit.cover,
+                placeholder:"lib/images/no-image-icon-23485.png",
                 useAvatarView: true,
                 avatarViewRadius: 60, // Ajustez la taille du cercle ici
               ),
@@ -459,13 +466,18 @@ class _ProfileMenuState extends State<ProfileMenu> {
                         ),
                       ),
 
-                      ElevatedButton(
+                      Container(
+                        width: MediaQuery.of(context).size.width/2,
+                        child: ElevatedButton(
 
 
-                          onPressed: (){
-                        updateChanges();
+                            onPressed: (){
+                              updateChanges();
 
-                      }, child: Text("Modifier"))
+                            }, child: Text("Modifier",style: TextStyle(color: Colors.white,fontSize: 18),)
+                        ),
+                      )
+
                       // Ajoutez cette partie sous le bouton "Modifier"
                       ,
                       Padding(padding: EdgeInsets.only(top: 25,bottom: 16,left: 16,right: 16),
@@ -581,7 +593,7 @@ class _ProfileMenuState extends State<ProfileMenu> {
   }
 
   Future chooseImage(ImageSource source) async{
-    XFile? file = await picker.pickImage(source: source,imageQuality: 10);
+    XFile? file = await picker.pickImage(source: source,imageQuality: GlobalVariable.profileQuality);
     if(file != null){
       setState(() {
         image = File(file!.path);

@@ -126,7 +126,7 @@ class _MurderQrState extends State<MurderQr> {
                           sendDataAndGenerateCode(qr_code);
                         }
                       },
-                      child: Text("Générer"),
+                      child: Text("Générer",style: TextStyle(color: Colors.white,fontSize: 18)),
                     ),
                   ],
                 ),

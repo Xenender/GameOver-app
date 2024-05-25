@@ -114,7 +114,12 @@ class _Leaderboard_profile_menuState extends State<Leaderboard_profile_menu> {
     String? imagePath = await user_repository.getUserImagePath(_userId);
 
     setState(() {
-      imageRemote = RemotePictureUp(imagePath:imagePath!,mapKey: imagePath!,fit: BoxFit.cover,useAvatarView: true,
+      imageRemote = RemotePictureUp(
+        imagePath:imagePath!,
+        mapKey: imagePath!,
+        placeholder:"lib/images/no-image-icon-23485.png",
+        fit: BoxFit.cover,
+        useAvatarView: true,
         avatarViewRadius: 100,);
     });
 
@@ -248,6 +253,7 @@ class _Leaderboard_profile_menuState extends State<Leaderboard_profile_menu> {
                       ? RemotePictureUp(
                     imagePath: trophies[index].img!,
                     mapKey: trophies[index].img!,
+                    placeholder:"lib/images/no-image-icon-23485.png",
                     fit: BoxFit.cover,
                     useAvatarView: true,
                     avatarViewRadius: 60, // Ajustez la taille du cercle ici
@@ -292,6 +298,7 @@ class _Leaderboard_profile_menuState extends State<Leaderboard_profile_menu> {
               child: RemotePictureUp(
                 imagePath: trophies[index].img!,
                 mapKey: trophies[index].img!,
+                placeholder:"lib/images/no-image-icon-23485.png",
                 fit: BoxFit.cover,
                 useAvatarView: true,
                 avatarViewRadius: 60, // Ajustez la taille du cercle ici

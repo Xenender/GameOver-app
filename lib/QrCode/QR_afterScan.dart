@@ -135,6 +135,8 @@ class _QR_afterScanState extends State<QR_afterScan> {
 
 
             //on ajoute la shared pref
+            print("code indice ___________________________________");
+            print(code_indice);
 
             SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -175,6 +177,28 @@ class _QR_afterScanState extends State<QR_afterScan> {
 
 
       }
+    }
+    if(_code.contains("indicePERMA_")){
+      isXp = false;
+      isIndice = true;
+
+      int startIndex = _code.indexOf("indicePERMA_") + "indicePERMA_".length;
+      int numero = int.parse(_code.substring(startIndex));
+
+
+      String code_indice = "indice$numero";
+
+      print("INDICEEQUAL");
+      print(code_indice == "indice2");
+
+
+      SharedPreferences.getInstance().then((prefs){
+        prefs.setBool(code_indice, true);
+
+      });
+
+
+
     }
 
   if(isXp){

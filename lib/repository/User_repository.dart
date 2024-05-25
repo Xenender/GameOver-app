@@ -1,17 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:gameover_app/repository/User_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class User_repository {
+  FirebaseFirestore? firebaseMock = null;
 
-  final _db = FirebaseFirestore.instance;
+
+  FirebaseFirestore? _db;
+
+  User_repository({this.firebaseMock=null}){
+    firebaseMock != null ? _db = firebaseMock! : _db = FirebaseFirestore.instance;
+  }
 
   Future<String> createUser(User_model user) async {
 
     String leReturn = "";
 
-    DocumentReference userRef = await _db.collection("users").add(user.toJson()).whenComplete(() async {
+    DocumentReference userRef = await _db!.collection("users").add(user.toJson()).whenComplete(() async {
 
       print("info envoyées");
 
@@ -29,7 +34,7 @@ class User_repository {
       //ajouter le chemin vers pdp à l'objet USER avec le bon nomage
 
 
-      await _db.collection("users")
+      await _db!.collection("users")
           .doc(userId) // <-- Doc ID where data should be updated.
           .update({"pdp":"images/$userId"})
           .then((value) => null);
@@ -47,7 +52,7 @@ class User_repository {
   }
 
   Future<List<User_model>> allUser() async{
-    final snapshot = await _db.collection("users").get();
+    final snapshot = await _db!.collection("users").get();
     final userData = snapshot.docs.map((e) => User_model.fromDocumentSnap(e)).toList();
     return userData;
   }
@@ -163,6 +168,28 @@ class User_repository {
       return null;
     }
   }
+
+
+  Future<bool> deleteUserByName(String username) async {
+
+    String id = "";
+    //find user id
+    List<User_model> userList = await allUser();
+
+    for(User_model user in userList){
+        if(user.username == username) id = user.id!;
+    }
+    try {
+
+      await FirebaseFirestore.instance.collection("users").doc(id).delete();
+      return true;
+
+    } catch (e) {
+      print("Erreur lors de la suppression user : $e");
+      return false;
+    }
+  }
+
 
 
 

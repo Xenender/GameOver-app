@@ -1,5 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gameover_app/murder/MurderHint.dart';
+import 'package:gameover_app/murder/MurderHint.dart' if(dart.library.html) 'package:gameover_app/murder/MurderHint_WEB.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../animations/ScrollBehavior1.dart';
@@ -12,8 +13,15 @@ class MurderHome extends StatefulWidget {
 class _MurderHomeState extends State<MurderHome> {
   // Exemple de liste de personnages avec horaires
   final List<List<String>> charactersData = [
-    ["Eren", "14h-15h"],
-    ["Mikasa", "8h-18h"],
+    ["ULREICH", "13h-19h"],
+    ["Nonline", "13h-19h"],
+    ["Eklyn", "13h-19h"],
+    ["Lara Croft", "13h-19h"],
+    ["Bravo 11", "13h-19h"],
+    ["Docteur Richards", "13h-19h"],
+    ["Régis", "13h-19h"],
+    ["Nithral", "13h-19h"],
+    ["Doc'", "13h-19h"],
     // Ajoutez d'autres personnages ici
   ];
 
@@ -77,28 +85,59 @@ class _MurderHomeState extends State<MurderHome> {
   void _goToIndicePage() {
     // Implémentez la navigation vers la page d'indices ici
     print('Ouverture de la page d\'indices');
-    showModalBottomSheet(
+    if(!kIsWeb){//mobile
+
+      showModalBottomSheet(
 
 
 
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(30.0),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(30.0),
+          ),
         ),
-      ),
-      context: context,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.80, // Définissez la hauteur maximale souhaitée
-      ),
-      isScrollControlled:true,
-      builder: (context) {
+        context: context,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.80, // Définissez la hauteur maximale souhaitée
+        ),
+        isScrollControlled:true,
+        builder: (context) {
 
-        return ScrollConfiguration(
-          behavior: ScrollBehavior1(), // Utilisez un ScrollBehavior personnalisé
-          child: MurderHint(),
-        );
-      },
-    );
+          return ScrollConfiguration(
+            behavior: ScrollBehavior1(), // Utilisez un ScrollBehavior personnalisé
+            child: MurderHint(),
+          );
+        },
+      );
+
+    }
+
+    else{//web
+
+      showModalBottomSheet(
+
+
+
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(30.0),
+          ),
+        ),
+        context: context,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.80, // Définissez la hauteur maximale souhaitée
+        ),
+        isScrollControlled:true,
+        builder: (context) {
+
+          return ScrollConfiguration(
+            behavior: ScrollBehavior1(), // Utilisez un ScrollBehavior personnalisé
+            child: MurderHint(),
+          );
+        },
+      );
+
+    }
   }
 
   @override
@@ -111,7 +150,9 @@ class _MurderHomeState extends State<MurderHome> {
         Column(
           children: [
             // Bouton pour ouvrir la page d'indices
-            Padding(padding: EdgeInsets.all(20),child:ElevatedButton(
+            Padding(padding: EdgeInsets.all(20),
+              child:
+              ElevatedButton(
               onPressed: () {
                 _goToIndicePage();
               },
@@ -122,9 +163,9 @@ class _MurderHomeState extends State<MurderHome> {
                 child:   Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.help), // Icône d'aide comme exemple
+                    Icon(Icons.help,color: Colors.white,), // Icône d'aide comme exemple
                     SizedBox(width: 8),
-                    Text('Voir vos indices'),
+                    Text("Vos indices",style: TextStyle(color: Colors.white,fontSize: 18),),
                   ],
                 ),
               ),
@@ -145,7 +186,8 @@ class _MurderHomeState extends State<MurderHome> {
                   final isChecked = prefs!.getBool(character) ?? false;
 
                   return ListTile(
-                    title: Row(
+                    title:
+                    Row(
                       children: [
                         Text('$character - $schedule'),
                         Spacer(),
@@ -164,6 +206,7 @@ class _MurderHomeState extends State<MurderHome> {
                     onTap: () {
                       // Action à effectuer lorsqu'on clique sur un élément
                       print('Nom associé à la case : $character');
+                      _handleCheckboxChange(character);
                     },
                   );
                 },
@@ -189,7 +232,7 @@ class _MurderHomeState extends State<MurderHome> {
                         _showConfirmationDialog(enteredCharacter);
                       }
                     },
-                    child: Text('Confirmer'),
+                    child: Text("Confirmer",style: TextStyle(color: Colors.white,fontSize: 18),),
                   ),
                 ],
               ),

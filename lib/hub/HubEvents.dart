@@ -1,23 +1,19 @@
 
 import 'package:cached_firestorage/lib.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover_app/animations/ScrollBehavior1.dart';
 import 'package:gameover_app/global/GlobalVariable.dart';
-import 'package:gameover_app/hub/Profile_menu.dart';
+import 'package:gameover_app/hub/Profile_menu.dart' if (dart.library.html) 'package:gameover_app/hub/Profile_menu_WEB.dart';
 import 'package:gameover_app/hub/Settings_menu.dart';
-import 'package:gameover_app/leaderboard/Leaderboard.dart';
-import 'package:gameover_app/murder/Murder_home.dart';
+
 import 'package:gameover_app/repository/Activity_model.dart';
 import 'package:gameover_app/repository/Activity_repository.dart';
 import 'package:gameover_app/repository/Storage_service.dart';
-import 'dart:io';
+
 
 import 'package:gameover_app/repository/User_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../repository/User_model.dart';
-
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../updatedLIBS/remote_picture_up.dart';
 
@@ -37,7 +33,27 @@ class _HubEventsState extends State<HubEvents>{
   double ?screenHeight;
   double ?screenWidth;
 
+  Widget activityLists = CircularProgressIndicator();
+  Widget futurePdp = CircularProgressIndicator();
 
+  @override
+  void initState() {
+    super.initState();
+    _initVariables();
+  }
+
+  // Charger les préférences partagées
+  _initVariables() async {
+
+    print("init VARIABLES");
+
+    activityLists = await activityList();
+    futurePdp = await pdp();
+
+    setState(() {
+
+    });
+  }
 
 
   @override
@@ -79,20 +95,7 @@ class _HubEventsState extends State<HubEvents>{
 
                              */
                             Padding(padding: EdgeInsetsDirectional.only(top: 50,bottom: 100),
-                            child: FutureBuilder<Column>(
-
-                              future: activityList(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return CircularProgressIndicator(); // En attendant la résolution de la future
-                                } else if (snapshot.hasError) {
-                                  print('Erreur : ${snapshot.error}');
-                                  return Container(width: 0,height: 0,);
-                                } else {
-                                  return snapshot.data??Column(children: []);
-                                }
-                              },
-                            ),
+                            child: activityLists
                             )
 
 
@@ -147,49 +150,39 @@ class _HubEventsState extends State<HubEvents>{
                           iconSize: 55,
                         ),
 
-                        GestureDetector(child: FutureBuilder<Container>(
-                          future: pdp(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return CircularProgressIndicator(); // En attendant la résolution de la future
-                            } else if (snapshot.hasError) {
-                              print('Erreur : ${snapshot.error}');
-                              return Container(width: 0,height: 0,);
-                            } else {
-                              return snapshot.data??Column(children: []);
-                            }
-                          },
-                        ),
+                        GestureDetector(child: futurePdp,
                           onTap: (){
 
-                            showModalBottomSheet(
+                              showModalBottomSheet(
 
 
-
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(30.0),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(30.0),
+                                  ),
                                 ),
-                              ),
-                              context: context,
-                              constraints: BoxConstraints(
-                                maxHeight: MediaQuery.of(context).size.height * 0.80, // Définissez la hauteur maximale souhaitée
-                              ),
-                              isScrollControlled:true,
-                              builder: (context) {
-                                GlobalVariable.toolContext = context; // Enregistrez le contexte du menu de paramètres
-                                return ScrollConfiguration(
-                                  behavior: ScrollBehavior1(), // Utilisez un ScrollBehavior personnalisé
-                                  child: ProfileMenu(), // Affichez votre menu de paramètres ici
-                                );
-                              },
-                            ).then((value){
-                              if(value != null){
-                                setState(() {
-                                  //actualiser la page apres un pop avec passage de données
-                                });
-                              }
-                            });
+                                context: context,
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.80, // Définissez la hauteur maximale souhaitée
+                                ),
+                                isScrollControlled:true,
+                                builder: (context) {
+                                  GlobalVariable.toolContext = context; // Enregistrez le contexte du menu de paramètres
+                                  return ScrollConfiguration(
+                                    behavior: ScrollBehavior1(), // Utilisez un ScrollBehavior personnalisé
+                                    child: ProfileMenu(), // Affichez votre menu de paramètres ici
+                                  );
+                                },
+                              ).then((value){
+                                if(value != null){
+                                  setState(() {
+                                    //actualiser la page apres un pop avec passage de données
+                                  });
+                                }
+                              });
+
+
+
                           },
                         )
 
@@ -241,6 +234,7 @@ class _HubEventsState extends State<HubEvents>{
       child: RemotePictureUp(
         imagePath: imagePath!,
         mapKey: imagePath!,
+        placeholder:"lib/images/no-image-icon-23485.png",
         useAvatarView: true,
         avatarViewRadius: 30,
         fit: BoxFit.cover,

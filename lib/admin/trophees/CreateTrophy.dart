@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gameover_app/animations/LoadingPage.dart';
+import 'package:gameover_app/global/GlobalVariable.dart';
 
 import 'package:gameover_app/repository/trophy/Trophy_model.dart';
 import 'package:gameover_app/repository/trophy/Trophy_repository.dart';
@@ -120,7 +121,7 @@ class _CreateTrophyState extends State<CreateTrophy> {
                       print("DONNES NON VALIDES");
                     }
                   },
-                  child: Text('Valider'),
+                  child: Text('Valider',style: TextStyle(color: Colors.white,fontSize: 18)),
                 ),
               ],
             ),
@@ -148,7 +149,7 @@ class _CreateTrophyState extends State<CreateTrophy> {
   }
 
   Future chooseImage(ImageSource source) async{
-    XFile? file = await picker.pickImage(source: source,imageQuality: 10);
+    XFile? file = await picker.pickImage(source: source,imageQuality: GlobalVariable.trophyQuality);
     if(file != null){
       setState(() {
         image = File(file!.path);

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover_app/admin/QRGenerator.dart';
 import 'package:gameover_app/admin/admin_murder/MurderQr.dart';
@@ -19,16 +20,18 @@ class AdminHub extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Spacer(), // Espace du haut
+            !(kIsWeb) ?
             ElevatedButton(
 
               onPressed: () {
                 // Action pour "Administrer les événements"
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>ActivityManagerPage()));
               },
-              child: Text('Administrer les événements'),
-            ),
+              child: Text('Administrer les événements',style: TextStyle(color: Colors.white,fontSize: 18)),
+            ):Container(),
             Spacer(), // Espace entre les boutons
 
+            !(kIsWeb) ?
             ElevatedButton(
               onPressed: () {
                 // Action pour "Générer un QR code"
@@ -40,8 +43,8 @@ class AdminHub extends StatelessWidget {
 
 
               },
-              child: Text('Administrer les trophées'),
-            ),
+              child: Text('Administrer les trophées',style: TextStyle(color: Colors.white,fontSize: 18)),
+            ):Container(),
             Spacer(),
 
             ElevatedButton(
@@ -55,7 +58,7 @@ class AdminHub extends StatelessWidget {
 
 
               },
-              child: Text("Donner de l'xp"),
+              child: Text("Donner de l'xp",style: TextStyle(color: Colors.white,fontSize: 18)),
             ),
             Spacer(), // Espace du bas
 
@@ -71,7 +74,7 @@ class AdminHub extends StatelessWidget {
 
 
               },
-              child: Text('Donner un indice (murder)'),
+              child: Text('Donner un indice (murder)',style: TextStyle(color: Colors.white,fontSize: 18)),
             ),
             Spacer(),
           ],

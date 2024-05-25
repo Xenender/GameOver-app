@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gameover_app/global/GlobalVariable.dart';
 import 'package:gameover_app/hub/Hub.dart';
 import 'package:gameover_app/repository/Storage_service.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
@@ -34,53 +35,48 @@ class _AvatarPageState extends State<AvatarPage> {
               Container(
                 alignment: Alignment.center,
                 margin: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                child: Stack(
-                  children: [
-                    profilePick(),
-                    Positioned.fill(
-                      child: Opacity(
-                        opacity: 0.0,
-                        child: ElevatedButton(
-                          onPressed: () => chooseImage(ImageSource.gallery),
-                          child: null,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                child:
+
+                    GestureDetector(
+                      onTap: (){
+                        chooseImage(ImageSource.gallery);
+                      },
+                      child: profilePick(),
+                    )
+
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (image != null) {
-                    User_model user = User_model(username: widget.name, score: 0);
-                    sendDataAndPushPage(user);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoadingPage(),
-                      ),
-                    );
-                  } else {
-                    setState(() {
-                      isError = true;
-                    });
-                  }
-                },
-                child: Text("Suivant", style: TextStyle(color: Colors.white)),
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      side: BorderSide(color: Colors.red),
-                    ),
-                  ),
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.lightBlue),
-                ),
-              ),
+
+
               isError
                   ? Text("Veuillez choisir une image pour valider",
                   style: TextStyle(color: Colors.red))
-                  : Container(width: 0, height: 0),
+                  : Container(),
+
+
+              Container(
+                width: MediaQuery.of(context).size.width/2,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (image != null) {
+                      User_model user = User_model(username: widget.name, score: 0);
+                      sendDataAndPushPage(user);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoadingPage(),
+                        ),
+                      );
+                    } else {
+                      setState(() {
+                        isError = true;
+                      });
+                    }
+                  },
+                  child: Text("Suivant",style: TextStyle(color: Colors.white,fontSize: 18),),
+                ),
+              )
+
+
             ],
           ),
           Padding(
@@ -88,12 +84,29 @@ class _AvatarPageState extends State<AvatarPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text("Ignorer l'étape (SOON...)"),
+                GestureDetector(
+                  onTap: (){
+
+
+                    User_model user = User_model(username: widget.name, score: 0);
+                    sendDataAndPushPageSKIP(user);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoadingPage(),
+                      ),
+                    );
+
+
+                  },
+                  child: Text("Ignorer l'étape"),
+                ),
+
                 PageViewDotIndicator(
                   currentItem: 1,
                   count: 2,
                   unselectedColor: Colors.black26,
-                  selectedColor: Colors.blue,
+                  selectedColor: Theme.of(context).colorScheme.primary,
                   duration: const Duration(milliseconds: 200),
                   boxShape: BoxShape.circle,
                 ),
@@ -106,7 +119,7 @@ class _AvatarPageState extends State<AvatarPage> {
   }
 
   Future chooseImage(ImageSource source) async {
-    XFile? file = await picker.pickImage(source: source, imageQuality: 10);
+    XFile? file = await picker.pickImage(source: source, imageQuality: GlobalVariable.profileQuality);
     if (file != null) {
       setState(() {
         image = File(file.path);
@@ -131,6 +144,21 @@ class _AvatarPageState extends State<AvatarPage> {
         );
       });
     }
+  }
+
+  void sendDataAndPushPageSKIP(User_model user) async {
+    User_repository rep = User_repository();
+    String idUser = await rep.createUser(user); // send data to Firestore
+
+
+
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Hub()),
+        );
+
   }
 
   Widget profilePick() {

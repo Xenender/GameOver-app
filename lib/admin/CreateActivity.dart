@@ -7,6 +7,7 @@ import 'package:gameover_app/repository/Activity_model.dart';
 import 'package:gameover_app/repository/Activity_repository.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../global/GlobalVariable.dart';
 import '../repository/Storage_service.dart';
 
 class CreateActivity extends StatefulWidget {
@@ -224,7 +225,7 @@ class _CreateActivityState extends State<CreateActivity> {
                       print("DONNES NON VALIDES");
                     }
                   },
-                  child: Text('Valider'),
+                  child: Text('Valider',style: TextStyle(color: Colors.white,fontSize: 18)),
                 ),
               ],
             ),
@@ -259,7 +260,7 @@ class _CreateActivityState extends State<CreateActivity> {
   }
 
   Future chooseImage(ImageSource source) async{
-    XFile? file = await picker.pickImage(source: source,imageQuality: 10);
+    XFile? file = await picker.pickImage(source: source,imageQuality: GlobalVariable.eventQuality);
     if(file != null){
       setState(() {
         image = File(file!.path);

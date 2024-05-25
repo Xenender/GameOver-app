@@ -144,7 +144,7 @@ class _QRGeneratorState extends State<QRGenerator> {
                         sendDataAndGenerateCode(qr_code);
                       }
                     },
-                    child: Text("Générer"),
+                    child: Text("Générer",style: TextStyle(color: Colors.white,fontSize: 18)),
                   ),
                 ],
               ),

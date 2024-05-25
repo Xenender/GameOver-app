@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -13,9 +14,27 @@ class Storage_service{
     }
   }
 
+  Future<void> uploadBytes(Uint8List bytes,String fileName) async{
+    try{
+      print("avant storage");
+      await storage.ref("/images/$fileName").putData(bytes);
+    } on firebase_core.FirebaseException catch (e){
+      print("Erreur firebase:");
+      print(e);
+    }
+  }
+
   Future<void> uploadFileFromAllPath(File file,String path) async{
     try{
       await storage.ref(path).putFile(file);
+    } on firebase_core.FirebaseException catch (e){
+      print(e);
+    }
+  }
+
+  Future<void> uploadFileFromAllPathBytes(Uint8List bytes,String path) async{
+    try{
+      await storage.ref(path).putData(bytes);
     } on firebase_core.FirebaseException catch (e){
       print(e);
     }

@@ -1,22 +1,36 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:gameover_app/home/AvatarPage.dart';
+import 'package:gameover_app/home/AvatarPage.dart' if (dart.library.html) 'package:gameover_app/home/AvatarPage_WEB.dart';
+import 'package:gameover_app/repository/User_model.dart';
+import 'package:gameover_app/repository/User_repository.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 
 import '../animations/SlidePageRoute.dart';
 import '../leaderboard/Leaderboard.dart';
 class NamePage extends StatefulWidget {
-  const NamePage({super.key});
+
+  User_repository? user_repositoryParam = null; //FOR TESTS
+
+  NamePage({super.key, this.user_repositoryParam = null});
 
   @override
-  State<NamePage> createState() => _NamePageState();
+  State<NamePage> createState() => _NamePageState(user_repositoryParam: this.user_repositoryParam);
 }
 
 class _NamePageState extends State<NamePage> {
 
   String? _name;
+  String? errorText;
+  User_repository? user_repositoryParam = null;
+
+  _NamePageState({this.user_repositoryParam = null});
 
   @override
   Widget build(BuildContext context) {
+
+    print("testBUILD");
+    print(user_repositoryParam);
+
     return Scaffold(
       body: Stack(
 
@@ -29,37 +43,77 @@ class _NamePageState extends State<NamePage> {
                   margin: EdgeInsets.symmetric(vertical: 10,horizontal: 80),
                   child: TextField(
                     onChanged: (e) {
-                      _name=e;
-                      print(_name);
+                      if(e.length < 15){
+                        _name=e;
+                        print(_name);
+                      }
+
                     },
+                    maxLength: 15,
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(hintText: "Votre nom"),
+                    decoration: InputDecoration(
+                      labelText: 'Votre pseudo',
+                      border: OutlineInputBorder(),
+
+                    ),
                   )
                 ),
 
+                errorText!=null?
+                    Text(errorText!,style: TextStyle(color: Colors.red),)
+                :Container(),
 
-                ElevatedButton(
-                  onPressed: ((){
 
-                    if(_name != null && _name != ""){
-                      Navigator.push(
-                        context,
-                        SlidePageRoute(page:AvatarPage(_name!)),
-                      );
-                    }
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 0),
+                  width: MediaQuery.of(context).size.width/2,
+                  child: ElevatedButton(
+                    onPressed: (() async {
 
-                  }),
-                  child: Text("Suivant",style: TextStyle(color: Colors.white),),
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(color: Colors.red)
-                          )
-                      )
-                      ,backgroundColor: MaterialStatePropertyAll<Color>(Colors.lightBlue)
+                      print("PREMIERS");
+
+
+                      if(_name != null && _name != ""){
+
+                        User_repository user_rep;
+
+                        user_repositoryParam != null ? user_rep = user_repositoryParam! : user_rep = User_repository();  //FOR TESTS
+
+
+                        bool pseudoLibre = true;
+                        user_rep.allUser().then((userList){
+                          for(var elem in userList){
+                            elem.username!.toLowerCase() == _name!.toLowerCase() ? pseudoLibre = false : null;
+                          }
+                          if(pseudoLibre){
+
+                            errorText = null;
+                            Navigator.push(
+                              context,
+                              SlidePageRoute(page:AvatarPage(_name!)),
+                            );
+                          }
+                          else{
+                            setState(() {
+                              errorText="Ce pseudo est déjà utilisé";
+                            });
+                          }
+
+                        });
+
+
+                      }
+                      else{//nom vide
+                        setState(() {
+                          errorText="Veuillez choisir un pseudo";
+                        });
+                      }
+
+                    }),
+                    child: Text("Suivant",style: TextStyle(color: Colors.white,fontSize: 18),),
                   ),
-                ),
+                )
+
               ],
               ),
 
@@ -73,7 +127,7 @@ class _NamePageState extends State<NamePage> {
                             currentItem: 0,
                             count: 2,
                             unselectedColor: Colors.black26,
-                            selectedColor: Colors.blue,
+                            selectedColor: Theme.of(context).colorScheme.primary,
                             duration: const Duration(milliseconds: 200),
                             boxShape: BoxShape.circle,
 

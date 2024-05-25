@@ -5,6 +5,7 @@ import 'package:cached_firestorage/cached_firestorage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gameover_app/animations/LoadingPage.dart';
+import 'package:gameover_app/global/GlobalVariable.dart';
 import 'package:gameover_app/repository/Activity_model.dart';
 import 'package:gameover_app/repository/Activity_repository.dart';
 import 'package:gameover_app/updatedLIBS/remote_picture_up.dart';
@@ -391,7 +392,7 @@ class _UpdateActivityState extends State<UpdateActivity> {
                             print("DONNES NON VALIDES");
                           }
                         },
-                        child: Text('Valider'),
+                        child: Text('Valider',style: TextStyle(color: Colors.white,fontSize: 18)),
                       ),
                     ],
                   ),
@@ -433,7 +434,7 @@ class _UpdateActivityState extends State<UpdateActivity> {
   }
 
   Future chooseImage(ImageSource source) async{
-    XFile? file = await picker.pickImage(source: source,imageQuality: 10);
+    XFile? file = await picker.pickImage(source: source,imageQuality: GlobalVariable.eventQuality);
     if(file != null){
       setState(() {
         image = File(file!.path);
@@ -453,9 +454,5 @@ class _UpdateActivityState extends State<UpdateActivity> {
     String url = await storage.downloadURL(imagename);
     return url;
   }
-
-  /*
-  test
-  */
 
 }

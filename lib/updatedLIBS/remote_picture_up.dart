@@ -65,6 +65,7 @@ class RemotePictureUp extends StatelessWidget {
             ? (_, __, ___) => Image.asset(placeholder!)
             : null,
         fit: fit,
+        filterQuality: FilterQuality.low,
       ),
     );
   }

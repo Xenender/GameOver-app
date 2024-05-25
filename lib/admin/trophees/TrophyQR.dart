@@ -121,7 +121,7 @@ class _QTrophyQRState extends State<TrophyQR> {
                           sendDataAndGenerateCode(qr_code);
                         }
                       },
-                      child: Text("Générer"),
+                      child: Text("Générer",style: TextStyle(color: Colors.white,fontSize: 18)),
                     ),
                   ],
                 ),

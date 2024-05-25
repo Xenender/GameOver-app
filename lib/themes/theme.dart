@@ -26,10 +26,10 @@ class AppTheme {
     colorScheme: ColorScheme(
 
       //primary: Color(0xFFF2B872),             // Couleur principale
-      primary: Color(0xFFF28627),
+      primary: Color(0xFFB379D9),
       onPrimary: Colors.white,          // Couleur du texte sur la couleur principale
       //secondary: Color(0xFFF27B50),          // Couleur secondaire
-      secondary: Color(0xFF03A6A6),
+      secondary: Color(0xFFBF656D),
       onSecondary: Colors.white,
       tertiary: Color(0xFFF2CFC2),
       onTertiary: Colors.white,
@@ -42,7 +42,7 @@ class AppTheme {
       error: Colors.red,                // Couleur en cas d'erreur
       onError: Colors.white,            // Couleur du texte en cas d'erreur
       onBackground: Colors.black,       // Couleur du texte sur l'arrière-plan
-      surface: Colors.grey,             // Couleur de surface
+      surface: Colors.white,             // Couleur de surface
       onSurface: Colors.black,          // Couleur du texte sur la surface
     )
 ,
@@ -57,8 +57,12 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
 
+          backgroundColor: Color(0xFF1AC5CA),
+          textStyle: GoogleFonts.montserrat(textStyle: TextStyle(color: Colors.white),color: Colors.white),
+
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0), // Ajustez la valeur pour définir la rondeur de la bordure
+            borderRadius: BorderRadius.circular(15.0),
+            // Ajustez la valeur pour définir la rondeur de la bordure
           ),
 
         )
@@ -75,10 +79,8 @@ class AppTheme {
 
   static final ThemeData darkTheme = ThemeData(
     primaryColor: Colors.blue,
-    backgroundColor: Colors.black,
     textTheme: TextTheme(
-      headline1: TextStyle(color: Colors.white),
-      headline2: TextStyle(color: Colors.white),
+
       // ...
     ),
   );

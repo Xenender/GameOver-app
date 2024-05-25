@@ -2,6 +2,7 @@
 import 'package:cached_firestorage/cached_firestorage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gameover_app/animations/LoadingPage.dart';
 import 'package:gameover_app/home/NamePage.dart';
 import 'package:gameover_app/repository/User_model.dart';
@@ -16,6 +17,12 @@ import 'hub/Hub.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
+  print("inside MAIn");
+  print(DefaultFirebaseOptions.currentPlatform);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
