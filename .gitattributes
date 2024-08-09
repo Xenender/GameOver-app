@@ -1,3 +1,4 @@
 web/** linguist-vendored=true
 .firebase/** linguist-vendored=true
 ios/** linguist-vendored=true
+android/** linguist-vendored=true
